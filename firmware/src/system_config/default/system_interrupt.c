@@ -70,6 +70,49 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
  
-/*******************************************************************************
+
+void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
+{
+  static uint16_t Timer1Counter = 0;
+  static bool FlagInit = 0;
+
+  if(FlagInit == 0)
+  {
+    if(Timer1Counter <= 2999)
+    {
+      Timer1Counter++;
+    }
+    else
+    {
+      Timer1Counter = 0;
+      FlagInit = 1;111111111
+    }
+  }
+  else
+  {
+    if(Timer1Counter <= 9)
+    {
+      Timer1Counter++;
+    }
+    else
+    {
+      Timer1Counter = 0;
+      APP_UpdateState(APP_STATE_SERVICE_TASKS);
+    }
+  }
+
+  ScanPec12();
+  LED1_W = !LED1_R;
+  PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_1);
+ 
+}
+void __ISR(_TIMER_3_VECTOR, ipl7AUTO) IntHandlerDrvTmrInstance1(void)
+{
+  LED0_W = 1;
+  GENSIG_Execute();
+  LED0_W = 0;
+  PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
+}
+ /*******************************************************************************
  End of File
 */
