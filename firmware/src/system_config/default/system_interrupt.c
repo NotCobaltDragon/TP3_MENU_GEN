@@ -85,12 +85,12 @@ void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
     else
     {
       Timer1Counter = 0;
-      FlagInit = 1;111111111
+      FlagInit = 1;//111111111
     }
   }
   else
   {
-    if(Timer1Counter <= 9)
+    if(Timer1Counter <= 8)
     {
       Timer1Counter++;
     }
