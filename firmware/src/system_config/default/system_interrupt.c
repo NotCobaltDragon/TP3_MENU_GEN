@@ -85,7 +85,7 @@ void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
     else
     {
       Timer1Counter = 0;
-      FlagInit = 1;111111111
+      FlagInit = 1;
     }
   }
   else
@@ -97,11 +97,11 @@ void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
     else
     {
       Timer1Counter = 0;
+      
       APP_UpdateState(APP_STATE_SERVICE_TASKS);
     }
+    ScanPec12(PEC12_A, PEC12_B, PEC12_PB);
   }
-
-  ScanPec12();
   LED1_W = !LED1_R;
   PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_1);
  

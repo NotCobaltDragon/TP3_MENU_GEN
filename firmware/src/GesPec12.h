@@ -32,6 +32,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define BL_TIMEOUT 5000  //Time out in [ms] when there's no activity
+#define HOLD_TIME 500  //Hold time when pushbutton is holded down
+#define TRUE 1
+#define FALSE 0
+
 // structure du descripteur du PEC
 // Migration : remplacement bool par champ 1 bit
 typedef struct {
@@ -39,8 +44,8 @@ typedef struct {
             uint8_t Dec : 1;             // événement décrément
             uint8_t OK  : 1;              // événement action OK
             uint8_t ESC : 1;             // événement action ESC
-            uint8_t NoActivity: 1 ;      // Indication de non activité
-            uint16_t PressDuration;   // Pour durée pression du P.B.
+            uint8_t NoActivity : 1;      // Indication de non activité
+            uint16_t PressDuration;     // Pour durée pression du P.B.
             uint16_t InactivityDuration;   // Pour durée inactivité
 } S_Pec12_Descriptor;
 

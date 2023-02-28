@@ -14,7 +14,7 @@
 
 #define MAGIC 0x123455AA
 
-typedef enum  { SignalSinus, SignalTriangle, SignalDentDeScie, SignalCarre } E_FormesSignal;
+typedef enum  {SignalSinus, SignalTriangle, SignalDentDeScie, SignalCarre} E_FormesSignal;
 
 // Structure des paramètres du générateur
 typedef struct {

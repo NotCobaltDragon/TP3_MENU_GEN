@@ -69,22 +69,68 @@ S_Pec12_Descriptor Pec12;
 
 void ScanPec12 (bool ValA, bool ValB, bool ValPB)
 {
+   //static uint8_t Hold_Counter = 0;
+
    // Traitement antirebond sur A, B et PB
    DoDebounce (&DescrA, ValA);
    DoDebounce (&DescrB, ValB);
    DoDebounce (&DescrPB, ValPB);
    
    // Détection incrément / décrément
-  
-   
+   if(DebounceIsPressed(&DescrB))
+   {
+      DebounceClearPressed(&DescrB);
+      if(DebounceGetInput(&DescrA) == 0)
+      {
+         Pec12.Inc = 1;
+      }
+      else
+      {
+         Pec12.Dec = 1; 
+      }
+   }
     
    // Traitement du PushButton
-   
-   
+   if(DebounceIsPressed(&DescrPB)==TRUE)
+   {
+      DebounceClearPressed(&DescrPB);
+      Pec12.PressDuration++;
+   }
+
+   if((DebounceGetInput(&DescrPB)==TRUE)&&(Pec12.PressDuration > 0))
+   {
+      Pec12.PressDuration++;
+   }
+   else if((DebounceGetInput(&DescrPB)==FALSE)&&(Pec12.PressDuration > 0))
+   {
+      if(Pec12.PressDuration >= HOLD_TIME)
+      {
+         Pec12.ESC == TRUE;
+         Pec12.PressDuration = 0;
+      }
+      else
+      {
+         Pec12.OK == TRUE;
+         Pec12.PressDuration = 0;
+      }
+      DebounceClearReleased(&DescrPB);
+   }   
+
+
    // Gestion inactivité
+   if((Pec12.Inc||Pec12.Dec||Pec12.OK||Pec12.ESC) == 0)
+   {
+      Pec12.InactivityDuration++;
+   }
+   else
+   {
+      Pec12ClearInactivity();
+   }
 
-
-   
+   if(Pec12.InactivityDuration >= BL_TIMEOUT)
+   {
+      Pec12.NoActivity = 1;
+   }
  } // ScanPec12
 
 
@@ -95,7 +141,7 @@ void Pec12Init (void)
    DebounceInit(&DescrB);
    DebounceInit(&DescrPB);
    
-   // Init de la structure PEc12
+   // Init de la structure Pec12
     Pec12.Inc = 0;             // événement incrément  
     Pec12.Dec = 0;             // événement décrément 
     Pec12.OK = 0;              // événement action OK
@@ -103,12 +149,7 @@ void Pec12Init (void)
     Pec12.NoActivity = 0;      // Indication d'activité
     Pec12.PressDuration = 0;   // Pour durée pression du P.B.
     Pec12.InactivityDuration = 0; // Durée inactivité
-  
  } // Pec12Init
-
-
-
-
 
 //       Pec12IsPlus       true indique un nouveau incrément
 bool Pec12IsPlus    (void) {
