@@ -105,12 +105,12 @@ void ScanPec12 (bool ValA, bool ValB, bool ValPB)
    {
       if(Pec12.PressDuration >= HOLD_TIME)
       {
-         Pec12.ESC == TRUE;
+         Pec12.ESC = TRUE;
          Pec12.PressDuration = 0;
       }
       else
       {
-         Pec12.OK == TRUE;
+         Pec12.OK = TRUE;
          Pec12.PressDuration = 0;
       }
       DebounceClearReleased(&DescrPB);

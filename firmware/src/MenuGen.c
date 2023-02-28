@@ -14,7 +14,7 @@ int rotary_value; //test value for
 
 S_ParamGen ParamGen;
 
-E_Menu_State Menu_State;
+E_Menu_State Menu_State = Main_Menu;
 
 uint8_t position = 0;
 
@@ -65,11 +65,21 @@ void MENU_Execute(S_ParamGen *pParam)
     if(selected == TRUE)
     {
         cursor[position] = SELECTED;
+        Menu_State = position;
     }
     else
     {
         cursor[position] = NAVIGATION;
     }
+
+    //Temporary should be removed
+    if(Pec12.ESC == TRUE && selected == TRUE)
+    {
+        selected = FALSE;
+        Menu_State = Main_Menu;
+        Pec12ClearESC();
+    }
+
 
     switch(Menu_State)
     {
@@ -103,46 +113,44 @@ void MENU_Execute(S_ParamGen *pParam)
         {
             if(Pec12.Inc == TRUE)
             {
-                wave_signal++;
-                if(wave_signal > 4){wave_signal = 0;}
+                ParamGen.Forme++;
+                if(ParamGen.Forme > 4){ParamGen.Forme = 0;}
                 Pec12ClearPlus();
             }
             else if(Pec12.Dec == TRUE)
             {
-                wave_signal--;
-                if(wave_signal < 0){wave_signal = 4;}
+                ParamGen.Forme--;
+                if(ParamGen.Forme < 0){ParamGen.Forme = 4;}
                 Pec12ClearMinus();
             }
             break;
         }
-    /*case Frequency_Menu:
+    case Frequency_Menu:
         {
             if(Pec12.Inc == TRUE)
             {
-                "frequency"+20;
-                if("frequency" > 2000){"frequency" = 0}
+                ParamGen.Frequence += FREQUENCY_INC;
+                if(ParamGen.Frequence > MAX_FREQUENCY){ParamGen.Frequence = MIN_FREQUENCY;}
                 Pec12ClearPlus();
             }
             else if(Pec12.Dec == TRUE)
             {
-                "frequency"-20;
-                if("frequency" < 0){"frequency" = 2000}
+                ParamGen.Frequence -= FREQUENCY_INC;
+                if(ParamGen.Frequence < MIN_FREQUENCY){ParamGen.Frequence = MAX_FREQUENCY;}
                 Pec12ClearMinus();
             }
             break;
         }
     case Amplitude_Menu:
         {
-            if(Pec12.Inc == TRUE && position < 10000)
+            if(Pec12.Inc == TRUE && ParamGen.Amplitude < MAX_AMPLITUDE)
             {
-                cursor[position + 1] = (cursor[position], cursor[position]=BLANK);
-                position+100;
+                ParamGen.Amplitude += AMPLITUDE_INC;
                 Pec12ClearPlus();
             }
-            else if(Pec12.Dec == TRUE && position > 0)
+            else if(Pec12.Dec == TRUE && ParamGen.Amplitude > MIN_AMPLITUDE)
             {
-                cursor[position - 1] = (cursor[position], cursor[position]=BLANK);
-                position-100;
+                ParamGen.Amplitude -= AMPLITUDE_INC;
                 Pec12ClearMinus();
             }
             break;
@@ -150,37 +158,21 @@ void MENU_Execute(S_ParamGen *pParam)
         
     case Offset_Menu:
         {
-            if(Pec12.Inc == TRUE && position < 5000)
+            if(Pec12.Inc == TRUE && position < MAX_OFFSET)
             {
-                cursor[position + 1] = (cursor[position], cursor[position]=BLANK);
-                position+100;
+                position += OFFSET_INC;
                 Pec12ClearPlus();
             }
-            else if(Pec12.Dec == TRUE && position > -5000)
+            else if(Pec12.Dec == TRUE && position > MIN_OFFSET)
             {
-                cursor[position - 1] = (cursor[position], cursor[position]=BLANK);
-                position-100;
+                position -= OFFSET_INC;
                 Pec12ClearMinus();
             }
             break;  
-        }*/
-        
+        }
+    default:
+    break;        
     }
-
-    
-
-    
-
-    /*switch(main_menu)
-    {
-    case NOT_SELECT:
-        switch
-
-    case WAVEFORM:
-
-    case FREQUENCY:
-
-    }*/
 
     //Display update
     lcd_gotoxy(1,1);

@@ -15,21 +15,39 @@
 
 #include "GesPec12.h" //not shure
 
-//Separation caracter between option and value "Frequ [Hz] X 1000"
+//Definitions for frequency option
+#define MIN_FREQUENCY 20
+#define MAX_FREQUENCY 2000
+#define FREQUENCY_INC 20
+
+//Definitions for amplitude option
+#define MIN_AMPLITUDE 100
+#define MAX_AMPLITUDE 10000
+#define AMPLITUDE_INC 100
+
+//Definitions for offset option
+#define MIN_OFFSET -5000
+#define MAX_OFFSET 5000
+#define OFFSET_INC 100
+
+
+/*---- LCD Symbol customisation ----*/
+// Separation caracter between option and value "Frequ [Hz] X 1000"
 #define SEPARATOR 246	// =>
 //#define SEPARATOR 61	// = (Specification sheet)
 
 
-// -----Cursor for navigation-----
+// Cursor for navigation
 #define NAVIGATION 199	// ->
 //#define NAVIGATION 42	// * (Specification sheet)
 
+// Cursor for selected option
 #define SELECTED 251	// ->| 
 //#define SELECTED 63	// ? (Specification sheet)
 
-#define BLANK 32	//Blank caracter
+#define BLANK 32	//Blank caracter DO NOT CHANGE
 
-typedef enum{Main_Menu, Wave_Menu, Frequency_Menu, Ampliture_Menu, Offset_Menu}E_Menu_State;
+typedef enum{Wave_Menu = 0, Frequency_Menu, Amplitude_Menu, Offset_Menu, Main_Menu}E_Menu_State;
 
 S_Pec12_Descriptor Pec12;
 
