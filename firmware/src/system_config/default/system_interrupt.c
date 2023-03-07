@@ -62,9 +62,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system/common/sys_common.h"
 #include "app.h"
 #include "system_definitions.h"
-//#include "GesPec12.h"
 
-//S_Pec12_Descriptor Pec12;
+#define INIT_TIME 2999  //Init time in [ms]
+#define MACHINE_CYCLE 10  //Cycle for execution sequence in [ms]
 
 // *****************************************************************************
 // *****************************************************************************
@@ -79,18 +79,19 @@ void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
 
   if(FlagInit == 0)
   {
-    if(Timer1Counter <= 2999)
+    if(Timer1Counter <= INIT_TIME)
     {
       Timer1Counter++;
     }
     else
     {
       Timer1Counter = 0;
+      FlagInit = 1;
     }
   }
   else
   {
-    if(Timer1Counter <= 8)
+    if(Timer1Counter < (MACHINE_CYCLE-2))
     {
       Timer1Counter++;
     }
