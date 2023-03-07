@@ -123,6 +123,8 @@ void APP_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     appData.state = APP_STATE_INIT;
+    DRV_TMR0_Initialize();
+    DRV_TMR1_Initialize();
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -160,6 +162,9 @@ void APP_Tasks ( void )
             // Initialisation du generateur
             GENSIG_Initialize(&LocalParamGen);
 
+            GENSIG_UpdateSignal(&LocalParamGen);
+            GENSIG_UpdatePeriode(&LocalParamGen);
+
             // Active les timers 
             DRV_TMR0_Start();
             DRV_TMR1_Start();
@@ -176,6 +181,7 @@ void APP_Tasks ( void )
             // Execution du menu
             MENU_Execute(&LocalParamGen);
             appData.state = APP_STATE_WAIT;
+            
          break;
         /* TODO: implement your application state machine.*/
 

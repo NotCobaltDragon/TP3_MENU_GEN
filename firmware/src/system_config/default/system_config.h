@@ -104,7 +104,7 @@ extern "C" {
 #define SYS_PORT_C_LAT          0x0000
 #define SYS_PORT_C_ODC          0x0000
 
-#define SYS_PORT_D_TRIS         0x4DC7
+#define SYS_PORT_D_TRIS         0x4DC5
 #define SYS_PORT_D_LAT          0x8238
 #define SYS_PORT_D_ODC          0x0000
 

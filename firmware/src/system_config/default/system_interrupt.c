@@ -86,12 +86,11 @@ void __ISR(_TIMER_1_VECTOR, ipl3AUTO) IntHandlerDrvTmrInstance0(void)
     else
     {
       Timer1Counter = 0;
-      FlagInit = 1;
     }
   }
   else
   {
-    if(Timer1Counter <= 9)
+    if(Timer1Counter <= 8)
     {
       Timer1Counter++;
     }
@@ -112,6 +111,7 @@ void __ISR(_TIMER_3_VECTOR, ipl7AUTO) IntHandlerDrvTmrInstance1(void)
   LED0_W = 1;
   GENSIG_Execute();
   LED0_W = 0;
+  //PWMA_HBRIDGE_W = !PWMA_HBRIDGE_R;
   PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
 }
  /*******************************************************************************
