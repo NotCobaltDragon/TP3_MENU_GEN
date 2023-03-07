@@ -3,10 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/microchip/harmony/v2_06/apps/MINF/TP/TP3_MENU_GEN/firmware/src/MenuGen.c</file>
-            <file>file:/C:/microchip/harmony/v2_06/apps/MINF/TP/TP3_MENU_GEN/firmware/src/GesPec12.c</file>
-            <file>file:/C:/microchip/harmony/v2_06/apps/MINF/TP/TP3_MENU_GEN/firmware/src/MenuGen.h</file>
-            <file>file:/C:/microchip/harmony/v2_06/apps/MINF/TP/TP3_MENU_GEN/firmware/src/app.c</file>
+            <file>file:/C:/microchip/harmony/v2_06/apps/MINF/TP/TP3_REGL/firmware/src/configuration_bitsSettings.h</file>
+            <file>file:/C:/microchip/harmony/v2_06/apps/MINF/TP/TP3_REGL/firmware/src/main_code.c</file>
+            <file>file:/C:/microchip/harmony/v2_06/apps/MINF/TP/TP3_REGL/firmware/src/PWMConfiguration.c</file>
+            <file>file:/C:/microchip/harmony/v2_06/apps/MINF/TP/TP3_REGL/firmware/src/configModuleTimers.c</file>
         </group>
     </open-files>
 </project-private>

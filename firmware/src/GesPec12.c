@@ -1,21 +1,21 @@
-// GesPec12.c  Canevas pour réalisation  
+// GesPec12.c  Canevas pour rÃ©alisation  
 // C. HUBER    09/02/2015
 
 // Fonctions pour la gestion du Pec12
 //
 //
-// Principe : Il est nécessaire d'appeler cycliquement la fonction ScanPec12
+// Principe : Il est nÃ©cessaire d'appeler cycliquement la fonction ScanPec12
 //            avec un cycle de 1 ms
 //
-//  Pour la gestion du Pec12, il y a 9 fonctions à disposition :
-//       Pec12IsPlus       true indique un nouveau incrément
-//       Pec12IsMinus      true indique un nouveau décrément
+//  Pour la gestion du Pec12, il y a 9 fonctions Ã  disposition :
+//       Pec12IsPlus       true indique un nouveau incrÃ©ment
+//       Pec12IsMinus      true indique un nouveau dÃ©crÃ©ment
 //       Pec12IsOK         true indique action OK
 //       Pec12IsESC        true indique action ESC
-//       Pec12NoActivity   true indique abscence d'activité sur PEC12
+//       Pec12NoActivity   true indique abscence d'activitÃ© sur PEC12
 //  Fonctions pour quittance des indications
-//       Pec12ClearPlus    annule indication d'incrément
-//       Pec12ClearMinus   annule indication de décrément
+//       Pec12ClearPlus    annule indication d'incrÃ©ment
+//       Pec12ClearMinus   annule indication de dÃ©crÃ©ment
 //       Pec12ClearOK      annule indication action OK
 //       Pec12ClearESC     annule indication action ESC
 //
@@ -23,7 +23,7 @@
 //---------------------------------------------------------------------------
 
 
-// définitions des types qui seront utilisés dans cette application
+// dÃ©finitions des types qui seront utilisÃ©s dans cette application
 
 #include "GesPec12.h"
 #include "Mc32Debounce.h"
@@ -36,7 +36,6 @@ S_SwitchDescriptor DescrPB;
 // Structure pour les traitement du Pec12
 S_Pec12_Descriptor Pec12;
 
-
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Principe utilisation des fonctions
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -47,12 +46,12 @@ S_Pec12_Descriptor Pec12;
 //              recoit la valeur des signaux et du boutons
 //
 // s'appuie sur le descripteur global.
-// Après l'appel le descripteur est mis à jour
+// AprÃ¨s l'appel le descripteur est mis Ã  jour
 
 // Comportement du PEC12
 // =====================
 
-// Attention 1 cran génère une pulse complète (les 4 combinaisons)
+// Attention 1 cran gÃ©nÃ¨re une pulse complÃ¨te (les 4 combinaisons)
 // D'ou traitement uniquement au flanc descendand de B
 
 // Dans le sens horaire CW:
@@ -76,7 +75,7 @@ void ScanPec12 (bool ValA, bool ValB, bool ValPB)
    DoDebounce (&DescrB, ValB);
    DoDebounce (&DescrPB, ValPB);
    
-   // Détection incrément / décrément
+   // DÃ©tection incrÃ©ment / dÃ©crÃ©ment
    if(DebounceIsPressed(&DescrB))
    {
       DebounceClearPressed(&DescrB);
@@ -89,35 +88,37 @@ void ScanPec12 (bool ValA, bool ValB, bool ValPB)
          Pec12.Dec = 1; 
       }
    }
-    
+   
    // Traitement du PushButton
+   if(Pec12.PressDuration > 0)
+   {
+      Pec12.PressDuration++;
+   }
+
    if(DebounceIsPressed(&DescrPB)==TRUE)
    {
+      Pec12.PressDuration = 1;
       DebounceClearPressed(&DescrPB);
-      Pec12.PressDuration++;
    }
 
-   if((DebounceGetInput(&DescrPB)==TRUE)&&(Pec12.PressDuration > 0))
+   if((DebounceIsReleased(&DescrPB)==TRUE)&&(Pec12.PressDuration > 0))
    {
-      Pec12.PressDuration++;
-   }
-   else if((DebounceGetInput(&DescrPB)==FALSE)&&(Pec12.PressDuration > 0))
-   {
-      if(Pec12.PressDuration >= HOLD_TIME)
+      if(Pec12.PressDuration>=HOLD_TIME)
       {
          Pec12.ESC = TRUE;
-         Pec12.PressDuration = 0;
+         //Pec12.PressDuration = 0;
       }
-      else
+      else// if(Pec12.PressDuration>=0)
       {
          Pec12.OK = TRUE;
-         Pec12.PressDuration = 0;
+         //Pec12.PressDuration = 0;
       }
+      Pec12.PressDuration = 0;
       DebounceClearReleased(&DescrPB);
-   }   
+   }
 
 
-   // Gestion inactivité
+   // Gestion inactivitÃ©
    if((Pec12.Inc||Pec12.Dec||Pec12.OK||Pec12.ESC) == 0)
    {
       Pec12.InactivityDuration++;
@@ -142,21 +143,21 @@ void Pec12Init (void)
    DebounceInit(&DescrPB);
    
    // Init de la structure Pec12
-    Pec12.Inc = 0;             // événement incrément  
-    Pec12.Dec = 0;             // événement décrément 
-    Pec12.OK = 0;              // événement action OK
-    Pec12.ESC = 0;             // événement action ESC
-    Pec12.NoActivity = 0;      // Indication d'activité
-    Pec12.PressDuration = 0;   // Pour durée pression du P.B.
-    Pec12.InactivityDuration = 0; // Durée inactivité
+    Pec12.Inc = 0;             // Ã©vÃ©nement incrÃ©ment  
+    Pec12.Dec = 0;             // Ã©vÃ©nement dÃ©crÃ©ment 
+    Pec12.OK = 0;              // Ã©vÃ©nement action OK
+    Pec12.ESC = 0;             // Ã©vÃ©nement action ESC
+    Pec12.NoActivity = 0;      // Indication d'activitÃ©
+    Pec12.PressDuration = 0;   // Pour durÃ©e pression du P.B.
+    Pec12.InactivityDuration = 0; // DurÃ©e inactivitÃ©
  } // Pec12Init
 
-//       Pec12IsPlus       true indique un nouveau incrément
+//       Pec12IsPlus       true indique un nouveau incrÃ©ment
 bool Pec12IsPlus    (void) {
    return (Pec12.Inc);
 }
 
-//       Pec12IsMinus      true indique un nouveau décrément
+//       Pec12IsMinus      true indique un nouveau dÃ©crÃ©ment
 bool Pec12IsMinus    (void) {
    return (Pec12.Dec);
 }
@@ -171,18 +172,18 @@ bool Pec12IsESC    (void) {
    return (Pec12.ESC);
 }
 
-//       Pec12NoActivity   true indique abscence d'activité sur PEC12
+//       Pec12NoActivity   true indique abscence d'activitÃ© sur PEC12
 bool Pec12NoActivity    (void) {
    return (Pec12.NoActivity);
 }
 
 //  Fonctions pour quittance des indications
-//       Pec12ClearPlus    annule indication d'incrément
+//       Pec12ClearPlus    annule indication d'incrÃ©ment
 void Pec12ClearPlus   (void) {
    Pec12.Inc = 0;
 }
 
-//       Pec12ClearMinus   annule indication de décrément
+//       Pec12ClearMinus   annule indication de dÃ©crÃ©ment
 void Pec12ClearMinus   (void) {
    Pec12.Dec = 0;
 }
