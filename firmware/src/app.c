@@ -147,7 +147,6 @@ void APP_Tasks ( void )
         case APP_STATE_INIT:
         {
             lcd_init();
-            lcd_bl_on();
 
             // Init SPI DAC
             SPI_InitLTC2604();
@@ -160,11 +159,6 @@ void APP_Tasks ( void )
 
             // Initialisation du generateur
             GENSIG_Initialize(&LocalParamGen);
-            
-            printf_lcd("Canevas Tp3       ");
-            // A adapter pour les 2 noms sur 2 lignes
-            lcd_gotoxy(1,2);
-            printf_lcd("C. Huber 03.02.2016");
 
             // Active les timers 
             DRV_TMR0_Start();
