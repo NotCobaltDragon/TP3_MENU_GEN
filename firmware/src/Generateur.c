@@ -19,10 +19,10 @@
 
 // Valeurs initiaux pour le générateur
 // SignalSinus, SignalTriangle, SignalDentDeScie, SignalCarre
-#define INIT_FREQ                  100
-#define INIT_FORM          SignalCarre
-#define INIT_AMPLITUDE           30000
-#define INIT_OFFSET              -25000
+#define INIT_FREQ                  20
+#define INIT_FORM          SignalDentDeScie
+#define INIT_AMPLITUDE           5000
+#define INIT_OFFSET              -2500
 #define DEFAULT_OFFSET           32767
 /*----------------------------------------*/
 #define MAX_VAL                  65535
@@ -55,7 +55,7 @@ void  GENSIG_UpdatePeriode(S_ParamGen *pParam)
     // Variable locale
     uint16_t Val_Periode = 0;
     
-    Val_Periode = F_SYS/(pParam -> Frequence * MAX_ECH * PRESCALER);
+    Val_Periode = (float)F_SYS/(float)(pParam -> Frequence * MAX_ECH * PRESCALER) - 1;
     PLIB_TMR_Period16BitSet(TMR_ID_3, Val_Periode);
 }
 
@@ -64,79 +64,60 @@ void  GENSIG_UpdateSignal(S_ParamGen *pParam)
 {
     // Variables locales
     uint8_t i = 0;
-    int32_t pointValue = (DEFAULT_OFFSET - pParam -> Amplitude + pParam -> Offset);
-    //uint8_t stepVal = 0;
     
-    for(i=0; i<MAX_ECH; i++)
+    int16_t DAC_Amplitude = ((float)pParam -> Amplitude * (float)DEFAULT_OFFSET) / 10000.5;
+    int16_t DAC_Offset = ((float)pParam -> Offset * (float)DEFAULT_OFFSET) / 10000.5;
+    float pointValue = ((float)DEFAULT_OFFSET - (float)DAC_Amplitude);
+    int32_t CalculOffset = 0;
+    
+    for(i=0; i<=MAX_ECH; i++)
     {
-        //val[1] = val[0]; 
         switch(pParam -> Forme)
         {
             case SignalSinus:
-                pointValue = pParam -> Amplitude * sin((float)2 * M_PI * i/(float)MAX_ECH) + 0.5 + DEFAULT_OFFSET + pParam -> Offset;
-                if(pointValue > MAX_VAL)
-                {
-                    pointValue = MAX_VAL;
-                }
-                else if(pointValue < MIN_VAL)
-                {
-                    pointValue = MIN_VAL;
-                }
-                SignalValues[i] = pointValue;
+                SignalValues[i] = ((float)DAC_Amplitude * sin((float)2 * M_PI * i/(float)MAX_ECH) + 0.5) + DEFAULT_OFFSET;
                 break;
             case SignalTriangle:
-                SignalValues[i] = pointValue;
-                if(i < (MAX_ECH / 2) - 1)
+                SignalValues[i] = pointValue + 0.5;
+                if(i < (MAX_ECH / 2))
                 {
-                    pointValue = pointValue + ((float)pParam -> Amplitude * (float)2 + (float)1) / (float)(MAX_ECH/2) + 0.5 + pParam -> Offset ;
+                    pointValue = pointValue + ((float)DAC_Amplitude * (float)2 + (float)1) / (float)(MAX_ECH/2.0);
                 }
                 else
                 {
-                    pointValue = pointValue - ((float)pParam -> Amplitude * (float)2 + (float)1) / (float)(MAX_ECH/2) + 0.5 + pParam -> Offset ;
-                }
-                if(pointValue > MAX_VAL)
-                {
-                    pointValue = MAX_VAL;
-                }
-                else if(pointValue < MIN_VAL)
-                {
-                    pointValue = MIN_VAL;
+                    pointValue = pointValue - ((float)DAC_Amplitude * (float)2 + (float)1) / (float)(MAX_ECH/2.0);
                 }
                 break;
             case SignalDentDeScie:
-                SignalValues[i] = pointValue;
-                pointValue = pointValue + ((float)pParam -> Amplitude * (float)2 + (float)1) / (float)MAX_ECH + 0.5 + pParam -> Offset;
-                if(pointValue > MAX_VAL)
-                {
-                    pointValue = MAX_VAL;
-                }
-                else if(pointValue < MIN_VAL)
-                {
-                    pointValue = MIN_VAL;
-                }
+                SignalValues[i] = pointValue + 0.5;
+                pointValue = pointValue + ((float)DAC_Amplitude * (float)2 + (float)1) / (float)(MAX_ECH - 1);
                 break;
             case SignalCarre:
                 if(i < (MAX_ECH / 2))
                 {
-                    pointValue = pParam -> Amplitude + 1 + DEFAULT_OFFSET + pParam -> Offset;
+                    SignalValues[i] = DAC_Amplitude + 1 + DEFAULT_OFFSET;;
                 }
                 else
                 {
-                    pointValue = -pParam -> Amplitude + DEFAULT_OFFSET + pParam -> Offset;
+                    SignalValues[i] = -DAC_Amplitude + DEFAULT_OFFSET;
                 }
-                if(pointValue > MAX_VAL)
-                {
-                    pointValue = MAX_VAL;
-                }
-                else if(pointValue < MIN_VAL)
-                {
-                    pointValue = MIN_VAL;
-                }
-                SignalValues[i] = pointValue;
                 break;
             default :
                 break;
         }
+    }
+    for(i=0; i<=MAX_ECH; i++)
+    {
+        CalculOffset = (int32_t)SignalValues[i] - (int32_t)DAC_Offset;
+        if(CalculOffset > MAX_VAL)
+        {
+            CalculOffset = MAX_VAL;
+        }
+        else if(CalculOffset < MIN_VAL)
+        {
+            CalculOffset = MIN_VAL;
+        }
+        SignalValues[i] = (uint16_t)CalculOffset;
     }
     // Test pour debug
     i = 10;
@@ -152,7 +133,7 @@ void  GENSIG_Execute(void)
    static uint16_t EchNb = 0;
    const uint16_t Step = 65535 / MAX_ECH;
 
-   //SPI_WriteToDac(0, Step * EchNb );      // sur canal 0
+//   SPI_WriteToDac(0, Step * EchNb );      // sur canal 0
    SPI_WriteToDac(0, SignalValues[EchNb]);      // sur canal 0
    EchNb++;
    EchNb = EchNb % MAX_ECH;
