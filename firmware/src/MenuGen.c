@@ -237,7 +237,6 @@ void MENU_Execute(S_ParamGen *pParam)
     {
         printf_lcd("%c", textSignal[ParamDisplay.Forme][lcdPosition]);
     }
-
     lcd_gotoxy(1,2);
     printf_lcd("%cFrequ [Hz] %c %-4d", cursor[1], SEPARATOR, ParamDisplay.Frequence);
     lcd_gotoxy(1,3);
