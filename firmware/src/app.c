@@ -58,6 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "Mc32gestSpiDac.h"
 #include "MenuGen.h"
 #include "GesPec12.h"
+#include "GesS9.h"
 #include "Generateur.h"
 
 // *****************************************************************************
@@ -156,6 +157,11 @@ void APP_Tasks ( void )
 
             // Initialisation PEC12
             Pec12Init();
+
+            // Initialisation S9
+            S9Init();
+
+            
 
             // Initialisation du generateur
             GENSIG_Initialize(&LocalParamGen);

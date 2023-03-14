@@ -35,6 +35,7 @@
         <itemPath>../src/Mc32SpiUtil.h</itemPath>
         <itemPath>../src/MenuGen.h</itemPath>
         <itemPath>../src/DefMenuGen.h</itemPath>
+        <itemPath>../src/GesS9.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="bsp" projectFiles="true">
         <logicalFolder name="f1" displayName="pic32mx_skes" projectFiles="true">
@@ -148,6 +149,7 @@
         <itemPath>../src/Mc32SpiUtil.c</itemPath>
         <itemPath>../src/Mc32gestSPiDac.c</itemPath>
         <itemPath>../src/MenuGen.c</itemPath>
+        <itemPath>../src/GesS9.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="bsp" projectFiles="true">
         <logicalFolder name="f1" displayName="pic32mx_skes" projectFiles="true">

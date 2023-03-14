@@ -8,28 +8,9 @@
 #include <stdbool.h>
 #include "MenuGen.h" 
 
-//S_ParamGen ParamGen;
-
 S_ParamGen ParamDisplay; //= {SignalSinus, 100, 500, 0};
 
-E_Menu_State Menu_State = Main_Menu;
-
-uint8_t position = 0;
-
-//int8_t wave_signal = 0;
-
-char cursor[4] = {BLANK, BLANK, BLANK, BLANK};
-
-uint8_t selected = FALSE;   //The option is selected or not 
-
-int lcdPosition;
-
-char textSignal[sizeof Menu_State][11]={"Sine Wave  ", "Triangle   ", "Saw Tooth  ", "Square Wave"};
-
-//cursor[position] = NOT_SELECT;
-
-//char form[] = {"Sine Wave"};
-
+E_Menu_State menuState = Main_Menu;
 
 // Initialisation du menu et des paramètres
 void MENU_Initialize(S_ParamGen *pParam)
@@ -39,8 +20,14 @@ void MENU_Initialize(S_ParamGen *pParam)
     lcd_gotoxy(1,3);
     printf_lcd("   TP3 MINF 22-23");
     lcd_gotoxy(1,4);
-    printf_lcd("    Alex & Einar");
-
+    if(pParam -> Magic != MAGIC)
+    {
+        printf_lcd("    MEMORY ERROR    ");
+    }
+    else
+    {
+        printf_lcd("    Alex & Einar");
+    }
     ParamDisplay.Forme = pParam -> Forme;
     ParamDisplay.Frequence = pParam -> Frequence;
     ParamDisplay.Amplitude = pParam -> Amplitude;
@@ -51,6 +38,14 @@ void MENU_Initialize(S_ParamGen *pParam)
 // Execution du menu, appel cyclique depuis l'application
 void MENU_Execute(S_ParamGen *pParam)
 {
+    static uint8_t position = 0;
+    static uint8_t selected = FALSE;   //The option is selected or not
+    static uint8_t saveMenu = FALSE;
+    char textSignal[4][11]={"Sine Wave  ", "Triangle   ", "Saw Tooth  ", "Square Wave"};
+    int lcdPosition;
+    static uint8_t saveMenuCounter = 0;
+    static char cursor[4] = {BLANK, BLANK, BLANK, BLANK};
+
     //Manage backlight
     if(Pec12.NoActivity == TRUE)
     {
@@ -61,7 +56,7 @@ void MENU_Execute(S_ParamGen *pParam)
         lcd_bl_on();
     }
 
-    switch(Menu_State)
+    switch(menuState)
     {
     case Main_Menu:
         {
@@ -93,10 +88,21 @@ void MENU_Execute(S_ParamGen *pParam)
                 Pec12ClearOK();
             }
 
+            if(S9.LNG == TRUE && selected == FALSE)
+            {
+                S9ClearLNG();
+                saveMenu = TRUE;
+            }
+
+            if(saveMenu == TRUE)
+            {
+                menuState = Save_Menu;
+            }
+
             if(selected == TRUE)
             {
                 cursor[position] = SELECTED;
-                Menu_State = position;
+                menuState = position;
 
                 ParamDisplay.Forme = pParam -> Forme;
                 ParamDisplay.Frequence = pParam -> Frequence;
@@ -129,14 +135,14 @@ void MENU_Execute(S_ParamGen *pParam)
             if(Pec12.OK == TRUE)
             {
                 pParam -> Forme = ParamDisplay.Forme;
-                Menu_State = Main_Menu;
+                menuState = Main_Menu;
                 selected = FALSE;
                 Pec12ClearOK();
             }
             else if(Pec12.ESC == TRUE)
             {
                 ParamDisplay.Forme = pParam -> Forme;
-                Menu_State = Main_Menu;
+                menuState = Main_Menu;
                 selected = FALSE;
                 Pec12ClearESC();
             }
@@ -159,14 +165,14 @@ void MENU_Execute(S_ParamGen *pParam)
             if(Pec12.OK == TRUE)
             {
                 pParam -> Frequence = ParamDisplay.Frequence;
-                Menu_State = Main_Menu;
+                menuState = Main_Menu;
                 selected = FALSE;
                 Pec12ClearOK();
             }
             else if(Pec12.ESC == TRUE)
             {
                 ParamDisplay.Frequence = pParam -> Frequence;
-                Menu_State = Main_Menu;
+                menuState = Main_Menu;
                 selected = FALSE;
                 Pec12ClearESC();
             }
@@ -189,14 +195,14 @@ void MENU_Execute(S_ParamGen *pParam)
             if(Pec12.OK == TRUE)
             {
                 pParam -> Amplitude = ParamDisplay.Amplitude;
-                Menu_State = Main_Menu;
+                menuState = Main_Menu;
                 selected = FALSE;
                 Pec12ClearOK();
             }
             else if(Pec12.ESC == TRUE)
             {
                 ParamDisplay.Amplitude = pParam -> Amplitude;
-                Menu_State = Main_Menu;
+                menuState = Main_Menu;
                 selected = FALSE;
                 Pec12ClearESC();
             }
@@ -218,34 +224,99 @@ void MENU_Execute(S_ParamGen *pParam)
             if(Pec12.OK == TRUE)
             {
                 pParam -> Offset = ParamDisplay.Offset;
-                Menu_State = Main_Menu;
+                menuState = Main_Menu;
                 selected = FALSE;
                 Pec12ClearOK();
             }
             else if(Pec12.ESC == TRUE)
             {
                 ParamDisplay.Offset = pParam -> Offset;
-                Menu_State = Main_Menu;
+                menuState = Main_Menu;
                 selected = FALSE;
                 Pec12ClearESC();
             }
             break;  
+        }
+    case Save_Menu:
+        {
+            if(S9.LNG == TRUE)
+            {
+                pParam -> Magic = MAGIC;
+                NVM_WriteBlock((uint32_t)pParam,sizeof(*pParam));
+                saveMenu = SAVED;
+                S9ClearLNG();
+            }
+            else if((Pec12.Inc||Pec12.Dec||Pec12.OK||Pec12.ESC) == 1)
+            {
+                saveMenu = CANCELED;
+            }
+
+            if((saveMenu == SAVED)||(saveMenu == CANCELED))
+            {
+                saveMenuCounter++;
+                if(saveMenuCounter>=CONFIRM_TIME)
+                {
+                    saveMenuCounter = 0;
+                    saveMenu = FALSE;
+                    menuState = Main_Menu;
+                    Pec12ClearInactivity();
+                }
+            }
+            break;
         }
     default:
     break;        
     }
 
     //Display update
-    lcd_gotoxy(1,1);
-    printf_lcd("%cShape %c ", cursor[0], SEPARATOR);
-    for (lcdPosition = 0; lcdPosition < 11; ++lcdPosition)
+    switch(saveMenu)
     {
-        printf_lcd("%c", textSignal[ParamDisplay.Forme][lcdPosition]);
+    case TRUE:
+        {
+            lcd_bl_on();
+            lcd_ClearLine(1);
+            lcd_gotoxy(1,2);
+            printf_lcd(" Save Parameters  ? ");
+            lcd_gotoxy(1,3);
+            printf_lcd("    (long press)    ");
+            lcd_ClearLine(4);
+            break;
+        }
+    case SAVED:
+        {
+            lcd_bl_on();
+            lcd_ClearLine(1);
+            lcd_gotoxy(1,2);
+            printf_lcd("  Parameters Saved  ");
+            lcd_ClearLine(3);
+            lcd_ClearLine(4);
+            break;
+        }
+    case CANCELED:
+        {
+            lcd_bl_on();
+            lcd_ClearLine(1);
+            lcd_gotoxy(1,2);
+            printf_lcd(" Operation Canceled ");
+            lcd_ClearLine(3);
+            lcd_ClearLine(4);
+            break;
+        }
+    default:
+        {
+            lcd_gotoxy(1,1);
+            printf_lcd("%cShape %c ", cursor[0], SEPARATOR);
+            for (lcdPosition = 0; lcdPosition < 11; lcdPosition++)
+            {
+                printf_lcd("%c", textSignal[ParamDisplay.Forme][lcdPosition]);
+            }
+            lcd_gotoxy(1,2);
+            printf_lcd("%cFrequ [Hz] %c %-4d", cursor[1], SEPARATOR, ParamDisplay.Frequence);
+            lcd_gotoxy(1,3);
+            printf_lcd("%cAmpli [mV] %c %-5d", cursor[2], SEPARATOR, ParamDisplay.Amplitude);
+            lcd_gotoxy(1,4);
+            printf_lcd("%cOffset [mV] %c %-5d", cursor[3], SEPARATOR, ParamDisplay.Offset);
+            break;
+        }
     }
-    lcd_gotoxy(1,2);
-    printf_lcd("%cFrequ [Hz] %c %-4d", cursor[1], SEPARATOR, ParamDisplay.Frequence);
-    lcd_gotoxy(1,3);
-    printf_lcd("%cAmpli [mV] %c %-5d", cursor[2], SEPARATOR, ParamDisplay.Amplitude);
-    lcd_gotoxy(1,4);
-    printf_lcd("%cOffset [mV] %c %-5d", cursor[3], SEPARATOR, ParamDisplay.Offset);
 }

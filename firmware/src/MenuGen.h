@@ -13,7 +13,8 @@
 #include "DefMenuGen.h"
 #include "Mc32DriverLcd.h"
 
-#include "GesPec12.h" //not shure
+#include "GesPec12.h"
+#include "GesS9.h"
 
 //Definitions for frequency option
 #define MIN_FREQUENCY 20
@@ -47,7 +48,14 @@
 
 #define BLANK 32	//Blank caracter DO NOT CHANGE
 
-typedef enum{Wave_Menu = 0, Frequency_Menu, Amplitude_Menu, Offset_Menu, Main_Menu}E_Menu_State;
+#define SAVED 45
+#define CANCELED 46
+
+#define CONFIRM_TIME 200 //Time out in [10ms] when there's no activity
+
+typedef enum{Wave_Menu = 0, Frequency_Menu, Amplitude_Menu, Offset_Menu, Main_Menu, Save_Menu}E_Menu_State;
+
+S_TacSwitch_Descriptor S9;
 
 S_Pec12_Descriptor Pec12;
 

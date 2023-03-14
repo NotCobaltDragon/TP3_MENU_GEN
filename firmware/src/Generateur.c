@@ -20,14 +20,19 @@ uint16_t SignalValues[MAX_ECH] = {0};
 // Initialisation du  générateur
 void  GENSIG_Initialize(S_ParamGen *pParam)
 {
-    // Fréquence par défaut = 20
-    pParam -> Frequence = INIT_FREQ;
-    // Forme du signal par défaut = Sinus
-    pParam -> Forme = INIT_FORM;
-    // Amplitude par défaut = 0;
-    pParam -> Amplitude = INIT_AMPLITUDE;
-    // Offset par défaut = 0
-    pParam -> Offset = INIT_OFFSET;
+    //Recup val mémoire
+    NVM_ReadBlock((uint32_t)pParam, sizeof(*pParam));
+    if(pParam->Magic != MAGIC)
+    {
+        // Fréquence par défaut = 20
+        pParam -> Frequence = INIT_FREQ;
+        // Forme du signal par défaut = Sinus
+        pParam -> Forme = INIT_FORM;
+        // Amplitude par défaut = 0;
+        pParam -> Amplitude = INIT_AMPLITUDE;
+        // Offset par défaut = 0
+        pParam -> Offset = INIT_OFFSET;
+    }
 }
   
 
