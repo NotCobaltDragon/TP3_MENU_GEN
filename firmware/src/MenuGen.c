@@ -8,9 +8,9 @@
 #include <stdbool.h>
 #include "MenuGen.h" 
 
-S_ParamGen ParamGen = {SignalSinus, 100, 500, 0};
+//S_ParamGen ParamGen;
 
-S_ParamGen ParamDisplay = {SignalSinus, 100, 500, 0};
+S_ParamGen ParamDisplay; //= {SignalSinus, 100, 500, 0};
 
 E_Menu_State Menu_State = Main_Menu;
 
@@ -40,6 +40,11 @@ void MENU_Initialize(S_ParamGen *pParam)
     printf_lcd("   TP3 MINF 22-23");
     lcd_gotoxy(1,4);
     printf_lcd("    Alex & Einar");
+
+    ParamDisplay.Forme = pParam -> Forme;
+    ParamDisplay.Frequence = pParam -> Frequence;
+    ParamDisplay.Amplitude = pParam -> Amplitude;
+    ParamDisplay.Offset = pParam -> Offset;
 }
 
 
@@ -55,14 +60,6 @@ void MENU_Execute(S_ParamGen *pParam)
     {
         lcd_bl_on();
     }
-
-    //Temporary should be removed
-    /*if(Pec12.ESC == TRUE && selected == TRUE)
-    {
-        selected = FALSE;
-        Menu_State = Main_Menu;
-        Pec12ClearESC();
-    }*/
 
     switch(Menu_State)
     {
@@ -100,7 +97,13 @@ void MENU_Execute(S_ParamGen *pParam)
             {
                 cursor[position] = SELECTED;
                 Menu_State = position;
-                ParamDisplay = ParamGen;
+
+                ParamDisplay.Forme = pParam -> Forme;
+                ParamDisplay.Frequence = pParam -> Frequence;
+                ParamDisplay.Amplitude = pParam -> Amplitude;
+                ParamDisplay.Offset = pParam -> Offset;
+
+                //ParamDisplay = ParamGen;
             }
             else
             {
@@ -125,14 +128,14 @@ void MENU_Execute(S_ParamGen *pParam)
             }
             if(Pec12.OK == TRUE)
             {
-                ParamGen.Forme = ParamDisplay.Forme;
+                pParam -> Forme = ParamDisplay.Forme;
                 Menu_State = Main_Menu;
                 selected = FALSE;
                 Pec12ClearOK();
             }
             else if(Pec12.ESC == TRUE)
             {
-                ParamDisplay.Forme = ParamGen.Forme;
+                ParamDisplay.Forme = pParam -> Forme;
                 Menu_State = Main_Menu;
                 selected = FALSE;
                 Pec12ClearESC();
@@ -155,14 +158,14 @@ void MENU_Execute(S_ParamGen *pParam)
             }
             if(Pec12.OK == TRUE)
             {
-                ParamGen.Frequence = ParamDisplay.Frequence;
+                pParam -> Frequence = ParamDisplay.Frequence;
                 Menu_State = Main_Menu;
                 selected = FALSE;
                 Pec12ClearOK();
             }
             else if(Pec12.ESC == TRUE)
             {
-                ParamDisplay.Frequence = ParamGen.Frequence;
+                ParamDisplay.Frequence = pParam -> Frequence;
                 Menu_State = Main_Menu;
                 selected = FALSE;
                 Pec12ClearESC();
@@ -171,26 +174,28 @@ void MENU_Execute(S_ParamGen *pParam)
         }
     case Amplitude_Menu:
         {
-            if(Pec12.Inc == TRUE && ParamDisplay.Amplitude < MAX_AMPLITUDE)
+            if(Pec12.Inc == TRUE)
             {
                 ParamDisplay.Amplitude += AMPLITUDE_INC;
+                if(ParamDisplay.Amplitude > MAX_AMPLITUDE){ParamDisplay.Amplitude = MIN_AMPLITUDE;}
                 Pec12ClearPlus();
             }
-            else if(Pec12.Dec == TRUE && ParamDisplay.Amplitude > MIN_AMPLITUDE)
+            else if(Pec12.Dec == TRUE)
             {
                 ParamDisplay.Amplitude -= AMPLITUDE_INC;
+                if(ParamDisplay.Amplitude < MIN_AMPLITUDE){ParamDisplay.Amplitude = MAX_AMPLITUDE;}
                 Pec12ClearMinus();
             }
             if(Pec12.OK == TRUE)
             {
-                ParamGen.Amplitude = ParamDisplay.Amplitude;
+                pParam -> Amplitude = ParamDisplay.Amplitude;
                 Menu_State = Main_Menu;
                 selected = FALSE;
                 Pec12ClearOK();
             }
             else if(Pec12.ESC == TRUE)
             {
-                ParamDisplay.Amplitude = ParamGen.Amplitude;
+                ParamDisplay.Amplitude = pParam -> Amplitude;
                 Menu_State = Main_Menu;
                 selected = FALSE;
                 Pec12ClearESC();
@@ -212,14 +217,14 @@ void MENU_Execute(S_ParamGen *pParam)
             }
             if(Pec12.OK == TRUE)
             {
-                ParamGen.Offset = ParamDisplay.Offset;
+                pParam -> Offset = ParamDisplay.Offset;
                 Menu_State = Main_Menu;
                 selected = FALSE;
                 Pec12ClearOK();
             }
             else if(Pec12.ESC == TRUE)
             {
-                ParamDisplay.Offset = ParamGen.Offset;
+                ParamDisplay.Offset = pParam -> Offset;
                 Menu_State = Main_Menu;
                 selected = FALSE;
                 Pec12ClearESC();

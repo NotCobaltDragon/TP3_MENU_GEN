@@ -12,6 +12,24 @@
 
 #include "DefMenuGen.h"
 
+// T.P. 2016 100 echantillons
+#define MAX_ECH 100
+
+// Valeurs initiaux pour le générateur
+// SignalSinus, SignalTriangle, SignalDentDeScie, SignalCarre
+#define INIT_FREQ                  20
+#define INIT_FORM          SignalDentDeScie
+#define INIT_AMPLITUDE           5000
+#define INIT_OFFSET              -2500
+#define DEFAULT_OFFSET           32767
+/*----------------------------------------*/
+#define MAX_VAL                  65535
+#define MIN_VAL                      0
+/*----------------------------------------*/
+
+#define F_SYS                 80000000
+#define PRESCALER                    1
+
 // Initialisation du  générateur
 void  GENSIG_Initialize(S_ParamGen *pParam);
 

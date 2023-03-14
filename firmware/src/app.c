@@ -83,6 +83,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 APP_DATA appData;
 S_ParamGen LocalParamGen;
+S_ParamGen CheckUpdateParamGen;
 
 
 // *****************************************************************************
@@ -156,16 +157,13 @@ void APP_Tasks ( void )
             // Initialisation PEC12
             Pec12Init();
 
-            // Initialisation du menu
-            MENU_Initialize(&LocalParamGen);
-
             // Initialisation du generateur
             GENSIG_Initialize(&LocalParamGen);
 
-            GENSIG_UpdateSignal(&LocalParamGen);
-            GENSIG_UpdatePeriode(&LocalParamGen);
+            // Initialisation du menu
+            MENU_Initialize(&LocalParamGen);
 
-            // Active les timers 
+            // Active les timers
             DRV_TMR0_Start();
             DRV_TMR1_Start();
             appData.state = APP_STATE_WAIT;
@@ -179,7 +177,18 @@ void APP_Tasks ( void )
             BSP_LEDToggle(BSP_LED_2);
 
             // Execution du menu
+            CheckUpdateParamGen = LocalParamGen;
             MENU_Execute(&LocalParamGen);
+            if((CheckUpdateParamGen.Forme!=LocalParamGen.Forme)||
+              (CheckUpdateParamGen.Amplitude!=LocalParamGen.Amplitude)||
+              (CheckUpdateParamGen.Offset!=LocalParamGen.Offset))
+            {
+              GENSIG_UpdateSignal(&LocalParamGen);
+            }
+            if(CheckUpdateParamGen.Frequence!=LocalParamGen.Frequence)
+            {
+              GENSIG_UpdatePeriode(&LocalParamGen);
+            }
             appData.state = APP_STATE_WAIT;
             
          break;
@@ -194,7 +203,7 @@ void APP_Tasks ( void )
     }
 }
 
-void APP_UpdateState ( APP_STATES NewState )
+void APP_UpdateState (APP_STATES NewState)
 {
     appData.state = NewState;
 }

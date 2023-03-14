@@ -17,7 +17,7 @@
 
 //Definitions for frequency option
 #define MIN_FREQUENCY 20
-#define MAX_FREQUENCY 2000
+#define MAX_FREQUENCY 4000
 #define FREQUENCY_INC 20
 
 //Definitions for amplitude option

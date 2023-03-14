@@ -14,24 +14,6 @@
 #include "math.h"
 #include "driver/tmr/drv_tmr_static.h"
 
-// T.P. 2016 100 echantillons
-#define MAX_ECH 100
-
-// Valeurs initiaux pour le générateur
-// SignalSinus, SignalTriangle, SignalDentDeScie, SignalCarre
-#define INIT_FREQ                  20
-#define INIT_FORM          SignalDentDeScie
-#define INIT_AMPLITUDE           5000
-#define INIT_OFFSET              -2500
-#define DEFAULT_OFFSET           32767
-/*----------------------------------------*/
-#define MAX_VAL                  65535
-#define MIN_VAL                      0
-/*----------------------------------------*/
-
-#define F_SYS                 80000000
-#define PRESCALER                    1
-
 // Variables globales
 uint16_t SignalValues[MAX_ECH] = {0};
 
@@ -130,11 +112,13 @@ void  GENSIG_UpdateSignal(S_ParamGen *pParam)
 // Version provisoire pour test du DAC à modifier
 void  GENSIG_Execute(void)
 {
-   static uint16_t EchNb = 0;
-   const uint16_t Step = 65535 / MAX_ECH;
+    LED7_W = 1;
+    static uint16_t EchNb = 0;
+    //const uint16_t Step = 65535 / MAX_ECH;
 
-//   SPI_WriteToDac(0, Step * EchNb );      // sur canal 0
-   SPI_WriteToDac(0, SignalValues[EchNb]);      // sur canal 0
-   EchNb++;
-   EchNb = EchNb % MAX_ECH;
+    //   SPI_WriteToDac(0, Step * EchNb );      // sur canal 0
+    SPI_WriteToDac(0, SignalValues[EchNb]);      // sur canal 0
+    EchNb++;
+    EchNb = EchNb % MAX_ECH;
+    LED7_W = 0;
 }
